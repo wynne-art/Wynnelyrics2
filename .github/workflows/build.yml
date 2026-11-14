@@ -32,15 +32,17 @@ jobs:
         run: |
           python3 -c '
           import re, pathlib
-          p = pathlib.Path("src/main/java/com/wynnelyrics/spotify/SpotifyAuth.java")
-          txt = p.read_text(encoding="utf-8")
-          new_txt, n = re.subn(
-              r"catch\s*\(\s*SocketTimeoutException\s+(\w+)\s*\)\s*\{\s*continue;\s*\}",
-              r"catch (SocketTimeoutException \1) { continue; } catch (java.io.IOException ioe) { break; }",
-              txt
-          )
-          p.write_text(new_txt, encoding="utf-8")
-          print("Patched:", n)
+          files = list(pathlib.Path(".").rglob("SpotifyAuth.java"))
+          assert files, "SpotifyAuth.java not found"
+          for p in files:
+              txt = p.read_text(encoding="utf-8")
+              new_txt, n = re.subn(
+                  r"catch\s*\(\s*SocketTimeoutException\s+(\w+)\s*\)\s*\{\s*continue;\s*\}",
+                  r"catch (SocketTimeoutException \1) { continue; } catch (java.io.IOException ioe) { break; }",
+                  txt
+              )
+              p.write_text(new_txt, encoding="utf-8")
+              print(f"Patched {p}: {n}")
           '
 
       - name: Set up JDK 21
