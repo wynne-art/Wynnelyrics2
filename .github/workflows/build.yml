@@ -28,6 +28,13 @@ jobs:
             fi
           fi
 
+      - name: Patch IOException in SpotifyAuth.java
+        run: |
+          FILE="src/main/java/com/wynnelyrics/spotify/SpotifyAuth.java"
+          if [ -f "$FILE" ]; then
+            sed -i 's/catch (SocketTimeoutException e) { continue; }/catch (SocketTimeoutException e) { continue; } catch (IOException e) { break; }/g' "$FILE"
+          fi
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
